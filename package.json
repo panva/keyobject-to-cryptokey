@@ -1,0 +1,36 @@
+{
+  "name": "keyobject-to-cryptokey",
+  "version": "0.0.1",
+  "description": "Converts KeyObject instances to CryptoKey for use with a given JSON Web Algorithm",
+  "keywords": [
+    "cryptokey",
+    "keyobject",
+    "convert"
+  ],
+  "homepage": "https://github.com/panva/keyobject-to-cryptokey",
+  "repository": "panva/keyobject-to-cryptokey",
+  "funding": {
+    "url": "https://github.com/sponsors/panva"
+  },
+  "license": "MIT",
+  "author": "Filip Skokan <panva.ip@gmail.com>",
+  "sideEffects": false,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist/index.js",
+    "dist/index.js.map",
+    "dist/index.d.ts"
+  ],
+  "scripts": {
+    "build": "tsc --target esnext --module nodenext --types node --moduleresolution nodenext --declaration --sourcemap --outdir dist index.ts && node --run format",
+    "format": "prettier -w .",
+    "test": "node --experimental-strip-types --test test.ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.3"
+  }
+}
