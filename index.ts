@@ -215,7 +215,9 @@ export function convert(
             name: alg.includes("GCM") ? "AES-GCM" : "AES-KW",
           },
           true,
-          ["wrapKey", "unwrapKey"],
+          alg.includes("GCM")
+            ? ["encrypt", "decrypt"]
+            : ["wrapKey", "unwrapKey"],
         );
       }
     }
