@@ -1,6 +1,6 @@
-import * as types from "node:util/types";
+const util = globalThis.process?.getBuiltinModule?.("node:util/types");
 function isKeyObject(input) {
-  if (!types.isKeyObject(input)) {
+  if (util?.isKeyObject?.(input) !== true) {
     throw new TypeError("keyObject must be an instance of KeyObject");
   }
 }

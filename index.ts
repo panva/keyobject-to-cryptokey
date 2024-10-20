@@ -1,8 +1,9 @@
 import type { KeyObject, webcrypto } from "node:crypto";
-import * as types from "node:util/types";
+
+const util = globalThis.process?.getBuiltinModule?.("node:util/types");
 
 function isKeyObject(input: unknown): asserts input is ConvertableKeyObject {
-  if (!types.isKeyObject(input)) {
+  if (util?.isKeyObject?.(input) !== true) {
     throw new TypeError("keyObject must be an instance of KeyObject");
   }
 }
