@@ -1,6 +1,6 @@
 {
   "name": "keyobject-to-cryptokey",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Converts KeyObject instances to CryptoKey for use with a given JSON Web Algorithm",
   "keywords": [
     "cryptokey",
