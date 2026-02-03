@@ -33,10 +33,10 @@ export function convert(
 ): webcrypto.CryptoKey {
   isKeyObject(keyObject);
 
-  if (
-    keyObject.asymmetricKeyType === "x25519" ||
-    keyObject.asymmetricKeyType === "x448"
-  ) {
+  const type = keyObject.type;
+  const asymmetricKeyType = keyObject.asymmetricKeyType as string;
+
+  if (asymmetricKeyType === "x25519" || asymmetricKeyType === "x448") {
     switch (alg) {
       case "ECDH-ES":
       case "ECDH-ES+A128KW":
@@ -49,33 +49,30 @@ export function convert(
     }
 
     return keyObject.toCryptoKey(
-      keyObject.asymmetricKeyType,
+      asymmetricKeyType,
       true,
-      keyObject.type === "private" ? ["deriveBits", "deriveKey"] : [],
+      type === "private" ? ["deriveBits", "deriveKey"] : [],
     );
   }
 
-  if (
-    keyObject.asymmetricKeyType === "ed25519" ||
-    keyObject.asymmetricKeyType === "ed448"
-  ) {
+  if (asymmetricKeyType === "ed25519" || asymmetricKeyType === "ed448") {
     switch (alg) {
       case "EdDSA":
         break;
       case "Ed25519":
       case "Ed448":
-        if (alg.toLowerCase() === keyObject.asymmetricKeyType) break;
+        if (alg.toLowerCase() === asymmetricKeyType) break;
 
       default:
         throw new TypeError("unsupported algorithm");
     }
 
-    return keyObject.toCryptoKey(keyObject.asymmetricKeyType, true, [
-      keyObject.type === "private" ? "sign" : "verify",
+    return keyObject.toCryptoKey(asymmetricKeyType, true, [
+      type === "private" ? "sign" : "verify",
     ]);
   }
 
-  if (keyObject.asymmetricKeyType === "rsa") {
+  if (asymmetricKeyType === "rsa") {
     let hash: string;
     switch (alg) {
       case "RSA-OAEP":
@@ -108,9 +105,7 @@ export function convert(
           hash,
         },
         true,
-        keyObject.type === "private"
-          ? ["decrypt", "unwrapKey"]
-          : ["encrypt", "wrapKey"],
+        type === "private" ? ["decrypt", "unwrapKey"] : ["encrypt", "wrapKey"],
       );
     }
 
@@ -120,11 +115,11 @@ export function convert(
         hash,
       },
       true,
-      [keyObject.type === "private" ? "sign" : "verify"],
+      [type === "private" ? "sign" : "verify"],
     );
   }
 
-  if (keyObject.asymmetricKeyType === "ec") {
+  if (asymmetricKeyType === "ec") {
     const namedCurve = nist.get(keyObject.asymmetricKeyDetails?.namedCurve);
     if (!namedCurve) {
       throw new TypeError("unsupported EC curve");
@@ -137,7 +132,7 @@ export function convert(
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
 
@@ -148,7 +143,7 @@ export function convert(
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
 
@@ -159,7 +154,7 @@ export function convert(
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
 
@@ -170,12 +165,12 @@ export function convert(
           namedCurve,
         },
         true,
-        keyObject.type === "private" ? ["deriveBits", "deriveKey"] : [],
+        type === "private" ? ["deriveBits", "deriveKey"] : [],
       );
     }
   }
 
-  if (keyObject.type === "secret") {
+  if (type === "secret") {
     switch (alg) {
       case "HS256":
       case "HS384":
