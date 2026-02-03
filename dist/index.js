@@ -11,10 +11,9 @@ const nist = new Map([
 ]);
 export function convert(keyObject, alg) {
   isKeyObject(keyObject);
-  if (
-    keyObject.asymmetricKeyType === "x25519" ||
-    keyObject.asymmetricKeyType === "x448"
-  ) {
+  const type = keyObject.type;
+  const asymmetricKeyType = keyObject.asymmetricKeyType;
+  if (asymmetricKeyType === "x25519" || asymmetricKeyType === "x448") {
     switch (alg) {
       case "ECDH-ES":
       case "ECDH-ES+A128KW":
@@ -25,29 +24,26 @@ export function convert(keyObject, alg) {
         throw new TypeError("unsupported algorithm");
     }
     return keyObject.toCryptoKey(
-      keyObject.asymmetricKeyType,
+      asymmetricKeyType,
       true,
-      keyObject.type === "private" ? ["deriveBits", "deriveKey"] : [],
+      type === "private" ? ["deriveBits", "deriveKey"] : [],
     );
   }
-  if (
-    keyObject.asymmetricKeyType === "ed25519" ||
-    keyObject.asymmetricKeyType === "ed448"
-  ) {
+  if (asymmetricKeyType === "ed25519" || asymmetricKeyType === "ed448") {
     switch (alg) {
       case "EdDSA":
         break;
       case "Ed25519":
       case "Ed448":
-        if (alg.toLowerCase() === keyObject.asymmetricKeyType) break;
+        if (alg.toLowerCase() === asymmetricKeyType) break;
       default:
         throw new TypeError("unsupported algorithm");
     }
-    return keyObject.toCryptoKey(keyObject.asymmetricKeyType, true, [
-      keyObject.type === "private" ? "sign" : "verify",
+    return keyObject.toCryptoKey(asymmetricKeyType, true, [
+      type === "private" ? "sign" : "verify",
     ]);
   }
-  if (keyObject.asymmetricKeyType === "rsa") {
+  if (asymmetricKeyType === "rsa") {
     let hash;
     switch (alg) {
       case "RSA-OAEP":
@@ -78,9 +74,7 @@ export function convert(keyObject, alg) {
           hash,
         },
         true,
-        keyObject.type === "private"
-          ? ["decrypt", "unwrapKey"]
-          : ["encrypt", "wrapKey"],
+        type === "private" ? ["decrypt", "unwrapKey"] : ["encrypt", "wrapKey"],
       );
     }
     return keyObject.toCryptoKey(
@@ -89,10 +83,10 @@ export function convert(keyObject, alg) {
         hash,
       },
       true,
-      [keyObject.type === "private" ? "sign" : "verify"],
+      [type === "private" ? "sign" : "verify"],
     );
   }
-  if (keyObject.asymmetricKeyType === "ec") {
+  if (asymmetricKeyType === "ec") {
     const namedCurve = nist.get(keyObject.asymmetricKeyDetails?.namedCurve);
     if (!namedCurve) {
       throw new TypeError("unsupported EC curve");
@@ -104,7 +98,7 @@ export function convert(keyObject, alg) {
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
     if (alg === "ES384" && namedCurve === "P-384") {
@@ -114,7 +108,7 @@ export function convert(keyObject, alg) {
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
     if (alg === "ES512" && namedCurve === "P-521") {
@@ -124,7 +118,7 @@ export function convert(keyObject, alg) {
           namedCurve,
         },
         true,
-        [keyObject.type === "private" ? "sign" : "verify"],
+        [type === "private" ? "sign" : "verify"],
       );
     }
     if (alg.startsWith("ECDH-ES")) {
@@ -134,11 +128,23 @@ export function convert(keyObject, alg) {
           namedCurve,
         },
         true,
-        keyObject.type === "private" ? ["deriveBits", "deriveKey"] : [],
+        type === "private" ? ["deriveBits", "deriveKey"] : [],
       );
     }
   }
-  if (keyObject.type === "secret") {
+  if (
+    asymmetricKeyType === "ml-dsa-44" ||
+    asymmetricKeyType === "ml-dsa-65" ||
+    asymmetricKeyType === "ml-dsa-87"
+  ) {
+    if (alg === asymmetricKeyType.toUpperCase()) {
+      return keyObject.toCryptoKey({ name: alg }, true, [
+        type === "private" ? "sign" : "verify",
+      ]);
+    }
+    throw new TypeError("unsupported algorithm");
+  }
+  if (type === "secret") {
     switch (alg) {
       case "HS256":
       case "HS384":

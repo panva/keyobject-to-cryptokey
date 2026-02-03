@@ -170,6 +170,20 @@ export function convert(
     }
   }
 
+  if (
+    asymmetricKeyType === "ml-dsa-44" ||
+    asymmetricKeyType === "ml-dsa-65" ||
+    asymmetricKeyType === "ml-dsa-87"
+  ) {
+    if (alg === asymmetricKeyType.toUpperCase()) {
+      return keyObject.toCryptoKey({ name: alg }, true, [
+        type === "private" ? "sign" : "verify",
+      ]);
+    }
+
+    throw new TypeError("unsupported algorithm");
+  }
+
   if (type === "secret") {
     switch (alg) {
       case "HS256":

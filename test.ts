@@ -8,6 +8,9 @@ const generateKeyPair = util.promisify(crypto.generateKeyPair);
 
 const ed25519 = new Set(["EdDSA", "Ed25519"]);
 const ed448 = new Set(["EdDSA", "Ed448"]);
+const mldsa44 = new Set(["ML-DSA-44"]);
+const mldsa65 = new Set(["ML-DSA-65"]);
+const mldsa87 = new Set(["ML-DSA-87"]);
 const x25519 = new Set([
   "ECDH-ES",
   "ECDH-ES+A128KW",
@@ -90,6 +93,9 @@ const secret256 = new Set([
 const all = new Set([
   ...ed25519,
   ...ed448,
+  ...mldsa44,
+  ...mldsa65,
+  ...mldsa87,
   ...x25519,
   ...x448,
   ...rsa,
@@ -149,6 +155,48 @@ test("x448", async () => {
 
   for (const alg of all) {
     if (x448.has(alg)) {
+      assert.doesNotThrow(() => convert(k.privateKey, alg));
+      assert.doesNotThrow(() => convert(k.publicKey, alg));
+    } else {
+      assert.throws(() => convert(k.privateKey, alg));
+      assert.throws(() => convert(k.publicKey, alg));
+    }
+  }
+});
+
+test("ml-dsa-44", async () => {
+  const k = await generateKeyPair("ml-dsa-44");
+
+  for (const alg of all) {
+    if (mldsa44.has(alg)) {
+      assert.doesNotThrow(() => convert(k.privateKey, alg));
+      assert.doesNotThrow(() => convert(k.publicKey, alg));
+    } else {
+      assert.throws(() => convert(k.privateKey, alg));
+      assert.throws(() => convert(k.publicKey, alg));
+    }
+  }
+});
+
+test("ml-dsa-65", async () => {
+  const k = await generateKeyPair("ml-dsa-65");
+
+  for (const alg of all) {
+    if (mldsa65.has(alg)) {
+      assert.doesNotThrow(() => convert(k.privateKey, alg));
+      assert.doesNotThrow(() => convert(k.publicKey, alg));
+    } else {
+      assert.throws(() => convert(k.privateKey, alg));
+      assert.throws(() => convert(k.publicKey, alg));
+    }
+  }
+});
+
+test("ml-dsa-87", async () => {
+  const k = await generateKeyPair("ml-dsa-87");
+
+  for (const alg of all) {
+    if (mldsa87.has(alg)) {
       assert.doesNotThrow(() => convert(k.privateKey, alg));
       assert.doesNotThrow(() => convert(k.publicKey, alg));
     } else {
